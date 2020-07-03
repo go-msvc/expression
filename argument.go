@@ -11,6 +11,7 @@ import (
 
 type IArgument interface {
 	Eval(ctx IContext) (interface{}, error)
+	String() string
 }
 
 type argument struct {
@@ -25,6 +26,7 @@ func ParseArgument(s string) (IArgument, error) {
 		l := len(s)
 		return &literal{value: s[1 : l-1]}, nil
 	}
+	log.Debugf("NOT QUOTED: %s", s)
 
 	if i, err := strconv.Atoi(s); err == nil {
 		return &literal{value: i}, nil
@@ -51,22 +53,38 @@ func parseArgument(s string) (string, IArgument, error) {
 		return s, nil, fmt.Errorf("no argument")
 	}
 
-	//get next separator: '(', ')', any operator, or white space
-	l := 1
-	for l < len(s) {
-		if unicode.IsSpace(rune(s[l])) || s[l] == '(' || s[l] == ')' {
-			break
+	log.Debugf("Parse arg from: %s", s)
+	var l int
+	if s[0] == '\'' || s[0] == '"' {
+		//read quoted argument
+		// var sc scanner.Scanner
+		// sc.Init(strings.NewReader(s))
+		// token := sc.Scan()
+		// if token == scanner.EOF {
+		// 	return s, nil, fmt.Errorf("failed to read quoted argument from %s", s)
+		// }
+		// l = len(sc.TokenText())
+
+		l = quotedLength(s)
+		log.Debugf("Quoted arg: %s", s[:l])
+	} else {
+		//unquoted: get next separator: '(', ')', any operator, or white space
+		l = 1
+		for l < len(s) {
+			if unicode.IsSpace(rune(s[l])) || s[l] == '(' || s[l] == ')' {
+				break
+			}
+			if _, oper := ParseOperator(s[l:]); oper != nil {
+				break
+			}
+			l++
 		}
-		if _, oper := ParseOperator(s[l:]); oper != nil {
-			break
-		}
-		l++
+		log.Debugf("UNQuoted arg: %s", s[:l])
 	}
-	//log.Debugf("parse arg from: [[ %s ]]", s[:l])
 
 	arg, err := ParseArgument(s[:l])
 	if err != nil {
-		return s, nil, errors.Wrapf(err, "expexted valid argument at %s", s)
+		return s, nil, errors.Wrapf(err, "expected valid argument (l=%d) at %s", l, s)
 	}
 
 	return s[l:], arg, nil
@@ -88,6 +106,13 @@ type literal struct {
 	value interface{}
 }
 
+func (l literal) String() string {
+	if s, ok := l.value.(string); ok {
+		return fmt.Sprintf("\"%s\"", s)
+	}
+	return fmt.Sprintf("%v", l.value)
+}
+
 func (l literal) Eval(ctx IContext) (interface{}, error) {
 	return l.value, nil
 }
@@ -96,10 +121,30 @@ type identifier struct {
 	name string
 }
 
+func (l identifier) String() string {
+	return l.name
+}
+
 func (l identifier) Eval(ctx IContext) (interface{}, error) {
 	i := ctx.Identifier(l.name)
 	if i == nil {
 		return nil, fmt.Errorf("identifier(%s) not found", l.name)
 	}
 	return i.Value(), nil
+}
+
+func quotedLength(s string) int {
+	if s[0] != '\'' && s[0] != '"' {
+		return 0
+	}
+	c := s[0]
+	l := 1
+	for l < len(s) {
+		if s[l] == c {
+			l++
+			break //end of string
+		}
+		l++ //skip over non-quote char
+	}
+	return l
 }

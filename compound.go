@@ -9,6 +9,7 @@ import (
 
 type ICompound interface {
 	Eval(ctx IContext) (interface{}, error)
+	String() string
 }
 
 func NewCompound(s string) (ICompound, error) {
@@ -21,6 +22,17 @@ func NewCompound(s string) (ICompound, error) {
 
 type Compound struct {
 	terms []term
+}
+
+func (c Compound) String() string {
+	s := ""
+	for _, t := range c.terms {
+		if t.oper != nil {
+			s += t.oper.String()
+		}
+		s += t.arg.String()
+	}
+	return s
 }
 
 //parses a compound expression breaks the expression into terms and operators
@@ -104,9 +116,9 @@ func (e *Compound) parse(level int, s string) (string, error) {
 			if err != nil {
 				return rem, errors.Wrapf(err, "invalid argument: %s", rem)
 			}
-			log.Debugf("Parsed arg: %T %v, rem: %s", arg, arg, rem)
 			term.arg = arg
 			rem = afterArg
+			log.Debugf("Parsed arg: %T %v, rem: %s", arg, arg, rem)
 		}
 
 		e.terms = append(e.terms, term)
@@ -115,6 +127,13 @@ func (e *Compound) parse(level int, s string) (string, error) {
 	}
 
 	log.Debugf("\"%s\" -> %d terms", s, len(e.terms))
+	for i, t := range e.terms {
+		if t.oper == nil {
+			log.Debugf("  [%d] %5.5s %s", i, "", t.arg)
+		} else {
+			log.Debugf("  [%d] %5.5s %s", i, t.oper, t.arg)
+		}
+	}
 	return rem, nil
 }
 
@@ -138,4 +157,19 @@ func (c Compound) Eval(ctx IContext) (interface{}, error) {
 		}
 	}
 	return val, nil
+}
+
+func (c *Compound) JSONUnmarshal(jsonValue []byte) error {
+	s := string(jsonValue)
+	if !isQuoted(s, '"') {
+		s = s[1 : len(s)-1]
+	}
+	if err := c.Parse(strings.Trim(string(jsonValue), "\"")); err != nil {
+		return errors.Wrapf(err, "invalid expression from %s", string(jsonValue))
+	}
+	return nil
+}
+
+func (c Compound) JSONMarshal() ([]byte, error) {
+	return []byte(c.String()), nil
 }

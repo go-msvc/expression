@@ -13,7 +13,7 @@ type IExpression interface {
 	Eval(ctx IContext) (interface{}, error)
 }
 
-func New(s string) (IExpression, error) {
+func NewExpression(s string) (IExpression, error) {
 	e := Expression{}
 	if err := e.Parse(s, nil); err != nil {
 		return e, err

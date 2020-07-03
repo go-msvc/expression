@@ -20,7 +20,7 @@ type operator struct {
 	oper string
 }
 
-func (o operator) String() string {
+func (o *operator) String() string {
 	return o.oper
 }
 
@@ -268,6 +268,9 @@ func getNumbers(v1, v2 interface{}) (float64, float64, bool) {
 func getNumber(v interface{}) (float64, bool) {
 	var n float64
 	var ok bool
+	if v == nil {
+		return float64(0), true
+	}
 	if n, ok = v.(float64); !ok {
 		var i int
 		if i, ok = v.(int); ok {
