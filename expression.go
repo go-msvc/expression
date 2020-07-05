@@ -3,11 +3,8 @@ package expression
 import (
 	"fmt"
 
-	logger "github.com/go-msvc/log"
 	"github.com/pkg/errors"
 )
-
-var log = logger.ForThisPackage().WithLevel(logger.ErrorLevel)
 
 type IExpression interface {
 	Eval(ctx IContext) (interface{}, error)

@@ -126,11 +126,11 @@ func (l identifier) String() string {
 }
 
 func (l identifier) Eval(ctx IContext) (interface{}, error) {
-	i := ctx.Identifier(l.name)
+	i := ctx.Get(l.name)
 	if i == nil {
 		return nil, fmt.Errorf("identifier(%s) not found", l.name)
 	}
-	return i.Value(), nil
+	return i, nil
 }
 
 func quotedLength(s string) int {

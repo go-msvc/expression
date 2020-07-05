@@ -1,11 +1,15 @@
 package expression
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
+	"bitbucket.org/vservices/utils/logger"
 	"github.com/pkg/errors"
 )
+
+var log = logger.L()
 
 type ICompound interface {
 	Eval(ctx IContext) (interface{}, error)
@@ -159,17 +163,25 @@ func (c Compound) Eval(ctx IContext) (interface{}, error) {
 	return val, nil
 }
 
-func (c *Compound) JSONUnmarshal(jsonValue []byte) error {
-	s := string(jsonValue)
-	if !isQuoted(s, '"') {
-		s = s[1 : len(s)-1]
+func (c *Compound) UnmarshalJSON(jsonValue []byte) error {
+	s := ""
+	if err := json.Unmarshal(jsonValue, &s); err != nil {
+		return errors.Wrapf(err, "failed to decode expression string")
 	}
-	if err := c.Parse(strings.Trim(string(jsonValue), "\"")); err != nil {
+	//logger.Top().SetLevel(logger.DebugLevel)
+	logger.SetLevel(logger.DebugLevel)
+	log.Debugf("Unmarshal compound: %s", s)
+
+	if isQuoted(s, '"') {
+		s = s[1 : len(s)-1]
+		log.Debugf("Unmarshal compound unquoted: %s", s)
+	}
+	if err := c.Parse(s); err != nil {
 		return errors.Wrapf(err, "invalid expression from %s", string(jsonValue))
 	}
 	return nil
 }
 
-func (c Compound) JSONMarshal() ([]byte, error) {
-	return []byte(c.String()), nil
+func (c Compound) MarshalJSON() ([]byte, error) {
+	return []byte("\"" + c.String() + "\""), nil
 }

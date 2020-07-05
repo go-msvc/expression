@@ -87,18 +87,42 @@ func TestCompound(t *testing.T) {
 	testList(t, list)
 }
 
+func TestCtx(t *testing.T) {
+	c := expression.NewContext()
+	c.Set("a", 1)
+	c.Set("b", 2)
+	c.Set("s", "27821234567")
+	list := []entry{
+		{"a", 1},
+		{"b", 2},
+		{"a+b", float64(3)},
+		{"b-a", float64(1)},
+		{"a>b", false},
+		{"b>a", true},
+		{"s=='2'", false},
+		{"s=='27821234567'", true},
+	}
+	testListCtx(t, list, c)
+}
+
 type entry struct {
 	expr     string
 	expValue interface{}
 }
 
 func testList(t *testing.T, list []entry) {
+	testListCtx(t, list, nil)
+}
+
+func testListCtx(t *testing.T, list []entry, ctx expression.IContext) {
+	if ctx == nil {
+		ctx = expression.NewContext()
+	}
 	for _, l := range list {
 		e, err := expression.NewCompound(l.expr)
 		if err != nil {
 			t.Fatal(errors.Wrapf(err, "failed to create expression"))
 		}
-		ctx := expression.NewContext()
 		val, err := e.Eval(ctx)
 		if err != nil {
 			t.Fatal(errors.Wrapf(err, "failed to eval expr(%s)", l.expr))
