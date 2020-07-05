@@ -6,6 +6,7 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/jansemmelink/log"
 	"github.com/pkg/errors"
 )
 
@@ -26,7 +27,6 @@ func ParseArgument(s string) (IArgument, error) {
 		l := len(s)
 		return &literal{value: s[1 : l-1]}, nil
 	}
-	log.Debugf("NOT QUOTED: %s", s)
 
 	if i, err := strconv.Atoi(s); err == nil {
 		return &literal{value: i}, nil

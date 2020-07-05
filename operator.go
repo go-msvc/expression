@@ -2,6 +2,7 @@ package expression
 
 import (
 	"fmt"
+	"os"
 	"regexp"
 	"sort"
 	"strings"
@@ -139,7 +140,7 @@ func init() {
 	MustAddOperator(operString{name: "~=", sfnc: func(s1, s2 string) bool {
 		r, err := regexp.Compile(s2)
 		if err != nil {
-			log.Errorf("cannot compile regex(%s): %v", s2, err)
+			fmt.Fprintf(os.Stderr, "cannot compile regex(%s): %v\n", s2, err)
 			return false
 		}
 		return r.MatchString(s1)

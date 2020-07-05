@@ -5,11 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"bitbucket.org/vservices/utils/logger"
+	"github.com/jansemmelink/log"
 	"github.com/pkg/errors"
 )
-
-var log = logger.L()
 
 type ICompound interface {
 	Eval(ctx IContext) (interface{}, error)
@@ -168,13 +166,8 @@ func (c *Compound) UnmarshalJSON(jsonValue []byte) error {
 	if err := json.Unmarshal(jsonValue, &s); err != nil {
 		return errors.Wrapf(err, "failed to decode expression string")
 	}
-	//logger.Top().SetLevel(logger.DebugLevel)
-	logger.SetLevel(logger.DebugLevel)
-	log.Debugf("Unmarshal compound: %s", s)
-
 	if isQuoted(s, '"') {
 		s = s[1 : len(s)-1]
-		log.Debugf("Unmarshal compound unquoted: %s", s)
 	}
 	if err := c.Parse(s); err != nil {
 		return errors.Wrapf(err, "invalid expression from %s", string(jsonValue))

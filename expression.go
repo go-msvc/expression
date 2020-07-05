@@ -33,8 +33,6 @@ func (e *Expression) Parse(s string, ctx IContext) error {
 		return errors.Wrapf(err, "invalid expression")
 	}
 
-	log.Debugf("expr(%s) -> term1(%s) oper(%s) term2(%s)", s, terms[0], oper, terms[1])
-
 	//parse the terms
 	e.term1, err = ParseArgument(terms[0])
 	if err != nil {
