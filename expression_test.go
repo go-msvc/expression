@@ -1,6 +1,7 @@
 package expression_test
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/go-msvc/expression"
@@ -101,6 +102,7 @@ func TestCtx(t *testing.T) {
 		{"b>a", true},
 		{"s=='2'", false},
 		{"s=='27821234567'", true},
+		{"s==\"27821234567\"", true},
 	}
 	testListCtx(t, list, c)
 }
@@ -152,3 +154,27 @@ func testListCtx(t *testing.T, list []entry, ctx expression.IContext) {
 }
 
 //todo: test with identifiers and context
+
+func TestJSONMarshal(t *testing.T) {
+	type rule struct {
+		Expr expression.Compound `json:"expr"`
+	}
+	r1 := rule{}
+	jsonRule := `{"expr":"value==\"123\""}`
+	if err := json.Unmarshal([]byte(jsonRule), &r1); err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("r1: %+v", r1)
+
+	jsonNew := []byte{}
+	var err error
+	jsonNew, err = json.Marshal(r1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(jsonRule) != len(jsonNew) {
+		t.Fatal("Different")
+	}
+	t.Logf("encoded: %s", string(jsonNew))
+
+}

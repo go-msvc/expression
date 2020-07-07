@@ -176,5 +176,6 @@ func (c *Compound) UnmarshalJSON(jsonValue []byte) error {
 }
 
 func (c Compound) MarshalJSON() ([]byte, error) {
-	return []byte("\"" + c.String() + "\""), nil
+	s := c.String()
+	return json.Marshal(s)
 }
