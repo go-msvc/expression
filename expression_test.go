@@ -5,12 +5,10 @@ import (
 	"testing"
 
 	"github.com/go-msvc/expression"
-	logger "github.com/go-msvc/log"
 	"github.com/pkg/errors"
 )
 
 func TestCompareNumbers(t *testing.T) {
-	logger.Top().SetLevel(logger.ErrorLevel)
 	list := []entry{
 		{"  1 == 2 ", false},
 		{"  2 == 2 ", true},
@@ -27,7 +25,6 @@ func TestCompareNumbers(t *testing.T) {
 }
 
 func TestCompareStrings(t *testing.T) {
-	logger.Top().SetLevel(logger.ErrorLevel)
 	list := []entry{
 		{" 'ja\"n' ==\"Jan\"", false},
 		{"  'jan'  =='jan'", true},
@@ -42,7 +39,6 @@ func TestCompareStrings(t *testing.T) {
 }
 
 func TestBool(t *testing.T) {
-	logger.Top().SetLevel(logger.ErrorLevel)
 	list := []entry{
 		{"false || false", false},
 		{"true || false", true},
@@ -57,7 +53,6 @@ func TestBool(t *testing.T) {
 }
 
 func TestRegex(t *testing.T) {
-	logger.Top().SetLevel(logger.ErrorLevel)
 	list := []entry{
 		{"'abc' ~= '[a-z]'", true},
 		{"'ABC' ~= '[a-z]'", false},
@@ -74,7 +69,6 @@ func TestRegex(t *testing.T) {
 }
 
 func TestCompound(t *testing.T) {
-	logger.Top().SetLevel(logger.ErrorLevel)
 	list := []entry{
 		{"(1==2)", false},
 		{"(2==2)", true},
@@ -132,7 +126,6 @@ func testListCtx(t *testing.T, list []entry, ctx expression.IContext) {
 		if val != l.expValue {
 			t.Fatalf("%s -> %T(%v) != %T(%v)", l.expr, val, val, l.expValue, l.expValue)
 		}
-		//t.Logf("OK: %s -> %T(%v)", l.expr, val, val)
 
 		//print expr to string
 		es := e.String()
@@ -164,9 +157,8 @@ func TestJSONMarshal(t *testing.T) {
 	if err := json.Unmarshal([]byte(jsonRule), &r1); err != nil {
 		t.Fatal(err)
 	}
-	t.Logf("r1: %+v", r1)
 
-	jsonNew := []byte{}
+	var jsonNew []byte
 	var err error
 	jsonNew, err = json.Marshal(r1)
 	if err != nil {
@@ -176,5 +168,4 @@ func TestJSONMarshal(t *testing.T) {
 		t.Fatal("Different")
 	}
 	t.Logf("encoded: %s", string(jsonNew))
-
 }

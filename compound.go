@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jansemmelink/log"
 	"github.com/pkg/errors"
 )
 
@@ -39,8 +38,6 @@ func (c Compound) String() string {
 
 //parses a compound expression breaks the expression into terms and operators
 func (e *Compound) Parse(s string) error {
-	log.Debugf("parsing compound[[ %s ]]", s)
-
 	rem, err := e.parse(0, s) //0=top level
 	if err != nil {
 		return errors.Wrapf(err, "failed to parse expr[%s]", s)
@@ -73,13 +70,11 @@ func (e *Compound) parse(level int, s string) (string, error) {
 	rem := s
 	for {
 		rem = strings.TrimSpace(rem)
-		log.Debugf("rem: \"%s\"", rem)
 		if len(rem) == 0 {
 			break
 		}
 		if rem[0] == ')' && level > 0 {
 			//end of this expression
-			log.Debugf("end of nested expression")
 			return rem, nil
 		}
 
@@ -89,7 +84,6 @@ func (e *Compound) parse(level int, s string) (string, error) {
 			return rem, fmt.Errorf("expect operator before \"...%s\"", rem)
 		}
 		if oper != nil {
-			log.Debugf("oper: %s", oper)
 			rem = afterOper
 		}
 
@@ -110,7 +104,6 @@ func (e *Compound) parse(level int, s string) (string, error) {
 			if len(rem) == 0 || rem[0] != ')' {
 				return rem, fmt.Errorf("expecting ')' before %s", rem)
 			}
-			log.Debugf("Parsed (arg): %T %v, rem: %s", arg, arg, rem)
 			term.arg = arg
 			rem = rem[1:]
 		} else {
@@ -120,21 +113,9 @@ func (e *Compound) parse(level int, s string) (string, error) {
 			}
 			term.arg = arg
 			rem = afterArg
-			log.Debugf("Parsed arg: %T %v, rem: %s", arg, arg, rem)
 		}
 
 		e.terms = append(e.terms, term)
-		log.Debugf("Now %d terms", len(e.terms))
-
-	}
-
-	log.Debugf("\"%s\" -> %d terms", s, len(e.terms))
-	for i, t := range e.terms {
-		if t.oper == nil {
-			log.Debugf("  [%d] %5.5s %s", i, "", t.arg)
-		} else {
-			log.Debugf("  [%d] %5.5s %s", i, t.oper, t.arg)
-		}
 	}
 	return rem, nil
 }

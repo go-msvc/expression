@@ -6,7 +6,6 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/jansemmelink/log"
 	"github.com/pkg/errors"
 )
 
@@ -53,7 +52,6 @@ func parseArgument(s string) (string, IArgument, error) {
 		return s, nil, fmt.Errorf("no argument")
 	}
 
-	log.Debugf("Parse arg from: %s", s)
 	var l int
 	if s[0] == '\'' || s[0] == '"' {
 		//read quoted argument
@@ -66,7 +64,6 @@ func parseArgument(s string) (string, IArgument, error) {
 		// l = len(sc.TokenText())
 
 		l = quotedLength(s)
-		log.Debugf("Quoted arg: %s", s[:l])
 	} else {
 		//unquoted: get next separator: '(', ')', any operator, or white space
 		l = 1
@@ -79,7 +76,6 @@ func parseArgument(s string) (string, IArgument, error) {
 			}
 			l++
 		}
-		log.Debugf("UNQuoted arg: %s", s[:l])
 	}
 
 	arg, err := ParseArgument(s[:l])

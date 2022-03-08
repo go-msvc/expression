@@ -57,8 +57,6 @@ func AddOperator(oper IOperator) error {
 	operators = append(operators, nil)
 	copy(operators[insertIndex+1:], operators[insertIndex:])
 	operators[insertIndex] = oper
-
-	//log.Debugf("Added oper[%d](%s)", insertIndex, operName)
 	return nil
 }
 
