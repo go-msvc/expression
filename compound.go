@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
+	"github.com/go-msvc/errors"
 )
 
 type ICompound interface {
@@ -36,7 +36,7 @@ func (c Compound) String() string {
 	return s
 }
 
-//parses a compound expression breaks the expression into terms and operators
+// parses a compound expression breaks the expression into terms and operators
 func (e *Compound) Parse(s string) error {
 	rem, err := e.parse(0, s) //0=top level
 	if err != nil {
@@ -53,7 +53,7 @@ type term struct {
 	arg  IArgument
 }
 
-//recursive parsing functions
+// recursive parsing functions
 func (e *Compound) parse(level int, s string) (string, error) {
 	//split on brackets
 	//a             -> [1]{ {oper:nil, arg:a}                                   }

@@ -3,7 +3,7 @@ package expression
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
+	"github.com/go-msvc/errors"
 )
 
 type IExpression interface {
@@ -18,7 +18,7 @@ func NewExpression(s string) (IExpression, error) {
 	return e, nil
 }
 
-//Expression
+// Expression
 type Expression struct {
 	valid bool
 	term1 IArgument
@@ -26,7 +26,7 @@ type Expression struct {
 	term2 IArgument
 }
 
-//parses a simple <term1><oper><term2> expression
+// parses a simple <term1><oper><term2> expression
 func (e *Expression) Parse(s string, ctx IContext) error {
 	terms, oper, err := SplitOnOperator(s)
 	if err != nil {

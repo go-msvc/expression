@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/pkg/errors"
+	"github.com/go-msvc/errors"
 )
 
 type IOperator interface {
@@ -16,7 +16,7 @@ type IOperator interface {
 	Eval(ctx IContext, t1, t2 IArgument) (interface{}, error)
 }
 
-//operator implements IOperator
+// operator implements IOperator
 type operator struct {
 	oper string
 }
@@ -60,7 +60,7 @@ func AddOperator(oper IOperator) error {
 	return nil
 }
 
-//parse operator at beginning of string, return remaining string and oper
+// parse operator at beginning of string, return remaining string and oper
 func ParseOperator(s string) (string, IOperator) {
 	operMutex.Lock()
 	defer operMutex.Unlock()
@@ -74,8 +74,8 @@ func ParseOperator(s string) (string, IOperator) {
 	return s, nil //no operator found
 }
 
-//Split to get terms before and after an operator, and trim space
-//<term><oper><term>
+// Split to get terms before and after an operator, and trim space
+// <term><oper><term>
 func SplitOnOperator(s string) ([]string, IOperator, error) {
 	operMutex.Lock()
 	defer operMutex.Unlock()

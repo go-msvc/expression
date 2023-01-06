@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/go-msvc/errors"
 	"github.com/go-msvc/expression"
-	"github.com/pkg/errors"
 )
 
 func TestCompareNumbers(t *testing.T) {

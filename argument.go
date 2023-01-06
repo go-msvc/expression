@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/pkg/errors"
+	"github.com/go-msvc/errors"
 )
 
 type IArgument interface {
@@ -46,7 +46,7 @@ func ParseArgument(s string) (IArgument, error) {
 	return nil, fmt.Errorf("unknown type of argument(%s)", s)
 }
 
-//parseArgument from start of s and return remaining expession
+// parseArgument from start of s and return remaining expession
 func parseArgument(s string) (string, IArgument, error) {
 	if len(s) == 0 {
 		return s, nil, fmt.Errorf("no argument")
