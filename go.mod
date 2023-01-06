@@ -1,7 +1,5 @@
 module github.com/go-msvc/expression
 
-go 1.12
+go 1.19
 
-require (
-	github.com/go-msvc/errors v0.9.1
-)
+require github.com/go-msvc/errors v1.2.0
